@@ -9,10 +9,7 @@
 
 import acm.graphics.*;
 import acm.program.*;
-import acm.util.*;
 
-import java.applet.*;
-import java.awt.*;
 import java.awt.event.*;
 
 public class Breakout extends GraphicsProgram {
@@ -21,35 +18,35 @@ public class Breakout extends GraphicsProgram {
     }
 
     /** Width and height of application window in pixels */
-    public static final int APPLICATION_WIDTH = 400;
-    public static final int APPLICATION_HEIGHT = 600;
+    public static final int APPLICATION_WIDTH = 500;
+    public static final int APPLICATION_HEIGHT = 700;
 
     /** Dimensions of game board (usually the same) */
     public static final int WIDTH = APPLICATION_WIDTH;
     public static final int HEIGHT = APPLICATION_HEIGHT;
 
     /** Dimensions of the paddle */
-    public static final int PADDLE_WIDTH = 60;
-    public static final int PADDLE_HEIGHT = 10;
+    public static final int PADDLE_WIDTH = 80;
+    public static final int PADDLE_HEIGHT = 20;
 
     /** Offset of the paddle up from the bottom */
     public static final int PADDLE_Y_OFFSET = 30;
 
     /** Number of bricks per row */
-    public static final int NBRICKS_PER_ROW = 10;
+    public static final int NBRICKS_PER_ROW = 5;
 
     /** Number of rows of bricks */
     public static final int NBRICK_ROWS = 10;
 
     /** Separation between bricks */
-    public static final int BRICK_SEP = 4;
+    public static final int BRICK_SEP = 10;
 
     /** Width of a brick */
     public static final int BRICK_WIDTH =
-            (WIDTH - (NBRICKS_PER_ROW - 1) * BRICK_SEP) / NBRICKS_PER_ROW;
+            (WIDTH - BRICK_SEP - (NBRICKS_PER_ROW - 1) * BRICK_SEP) / NBRICKS_PER_ROW;
 
     /** Height of a brick */
-    public static final int BRICK_HEIGHT = 8;
+    public static final int BRICK_HEIGHT = 15;
 
     /** Radius of the ball in pixels */
     public static final int BALL_RADIUS = 10;
@@ -64,12 +61,17 @@ public class Breakout extends GraphicsProgram {
     /** Runs the Breakout program. */
     public void run() {
         this.setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
+        mainMenu();
         addMouseListeners();
+    }
 
-        Level1 level1 = new Level1(this);
-        level1.createBricks();
-
-        drawPaddle();
+    private void mainMenu() {
+        mainMenu = new MainMenu(this);
+        mainMenu.createBackground();
+        mainMenu.createBricks();
+        mainMenu.createTitle();
+        mainMenu.createButtons();
+        mainMenu.playMenuMusic();
     }
 
     public void addToBoard(GObject object) {
@@ -80,8 +82,23 @@ public class Breakout extends GraphicsProgram {
         int x = (APPLICATION_WIDTH - PADDLE_WIDTH) / 2;
         int y = APPLICATION_HEIGHT - PADDLE_HEIGHT - PADDLE_Y_OFFSET;
 
-        paddle = new Paddle(x, y);
+        paddle = new Paddle(this, x, y);
         add(paddle.getPaddle());
+    }
+
+    public void mouseClicked(MouseEvent e) {
+        double x = e.getX();
+        double y = e.getY();
+
+        if (mainMenu.isLevel1Clicked(x, y)) {
+            removeAll();
+
+            Level1 level1 = new Level1(this);
+            level1.createBackground();
+            level1.createBricks();
+
+            drawPaddle();
+        }
     }
 
     public void mouseMoved(MouseEvent e) {
@@ -98,5 +115,7 @@ public class Breakout extends GraphicsProgram {
         paddle.move(x);
     }
 
+    private MainMenu mainMenu;
+    private LevelButton level1Buttonl;
     private Paddle paddle;
 }
