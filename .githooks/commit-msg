@@ -1,0 +1,26 @@
+#!/bin/sh
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(head -n 1 "$COMMIT_MSG_FILE")
+
+# Allowed prefixes: add, edit, fix, delete, refactor, docs
+# Format: "prefix: description (minimum 3 characters)"
+PATTERN="^(add|edit|fix|delete|refactor|docs): .{3,}$"
+
+# Skip automatic Git merge commits
+if echo "$COMMIT_MSG" | grep -qE "^Merge "; then
+  exit 0
+fi
+
+if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+  echo "❌ Invalid commit message format!"
+  echo "Your commit: \"$COMMIT_MSG\""
+  echo ""
+  echo "Expected format: <type>: <description>"
+  echo "Allowed types: add, edit, fix, delete, refactor, docs"
+  echo "Examples:"
+  echo "  add: user login endpoint"
+  echo "  edit: paddle collision logic"
+  echo "  fix: database connection timeout"
+  exit 1
+fi
