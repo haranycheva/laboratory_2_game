@@ -36,7 +36,7 @@ public class Breakout extends GraphicsProgram {
     public static final int NBRICKS_PER_ROW = 5;
 
     /** Number of rows of bricks */
-    public static final int NBRICK_ROWS = 1;
+    public static final int NBRICK_ROWS = 10;
 
     /** Separation between bricks */
     public static final int BRICK_SEP = 10;
