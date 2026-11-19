@@ -7,15 +7,37 @@ public class Level {
     protected Paddle paddle;
     protected GRect background;
 
+    protected int bricksRemaining = 0;
+    private boolean didWin = false;
+
     public Level(Breakout game) {
         this.game = game;
     }
 
     public void setup() {
+        bricksRemaining = 0;
+        didWin = false;
         createBackground();
         createPaddle();
         createBricks();
         spawnBall();
+    }
+
+    public void increaseBrickAmount(){
+        bricksRemaining+=1;
+    }
+
+    protected void onBrickDestroyed(GObject obj) {
+        game.remove(obj);
+        bricksRemaining--;
+        if (bricksRemaining <= 0) {
+            bricksRemaining = 0;
+            didWin = true;
+        }
+    }
+
+    public boolean didWin() {
+        return didWin;
     }
 
     public void createBricks() {
@@ -34,6 +56,14 @@ public class Level {
                 gameOver();
             } else {
                 checkCollisions();
+            }
+
+            if(didWin){
+                game.remove(ball);
+                ball = null;
+                isRunning = false;
+                gameWon();
+                continue;
             }
 
             game.pause(20);
@@ -90,7 +120,7 @@ public class Level {
             if (bottomObj == paddleObj) {
                 ball.setLocation(bx, paddleObj.getY() - r - 1);
             } else {
-                game.remove(bottomObj);
+                onBrickDestroyed(bottomObj);
             }
             ball.bounceY();
             return;
@@ -98,27 +128,36 @@ public class Level {
 
         GObject topObj = game.getElementAt(bx, by - r - 1);
         if (topObj != null && topObj != ball && topObj != background) {
-            if (topObj != paddleObj) game.remove(topObj);
+            if (topObj != paddleObj){
+                onBrickDestroyed(topObj);
+            }
             ball.bounceY();
             return;
         }
 
         GObject leftObj = game.getElementAt(bx - r - 1, by);
         if (leftObj != null && leftObj != ball && leftObj != background) {
-            if (leftObj != paddleObj) game.remove(leftObj);
+            if (leftObj != paddleObj) {
+                onBrickDestroyed(leftObj);
+            }
             ball.bounceX();
             return;
         }
 
         GObject rightObj = game.getElementAt(bx + r + 1, by);
         if (rightObj != null && rightObj != ball && rightObj != background) {
-            if (rightObj != paddleObj) game.remove(rightObj);
+            if (rightObj != paddleObj){
+                onBrickDestroyed(rightObj);
+            }
             ball.bounceX();
         }
     }
 
     public void gameOver() {
     }
-    
+
+    public void gameWon(){
+
+    }
 
 }

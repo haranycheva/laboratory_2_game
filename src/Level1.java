@@ -40,7 +40,7 @@ public class Level1 extends Level{
                 }
 
                 Brick brick = new Brick(x, y, color);
-
+                this.increaseBrickAmount();
                 this.game.addToBoard(brick.getBrick());
             }
         }
