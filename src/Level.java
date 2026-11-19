@@ -19,7 +19,6 @@ public class Level {
     }
 
     public void createBricks() {
-
     }
 
     public void play() {
@@ -118,7 +117,8 @@ public class Level {
         }
     }
 
-    protected void gameOver() {
-        // Показ напису Game Over та pause(2000) перед поверненням у меню
+    public void gameOver() {
     }
+    
+
 }
