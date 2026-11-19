@@ -96,12 +96,18 @@ public class Breakout extends GraphicsProgram {
             Level1 level1 = new Level1(this);
             level1.createBackground();
             level1.createBricks();
-
             drawPaddle();
+            level1.runLevel(paddle);
         }
     }
 
+    private void playLevelOne(){
+
+    }
+
     public void mouseMoved(MouseEvent e) {
+        if (paddle == null) return;
+
         int x = e.getX() - Breakout.PADDLE_WIDTH / 2;
 
         if (x < 0) {
