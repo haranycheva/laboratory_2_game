@@ -61,8 +61,22 @@ public class Breakout extends GraphicsProgram {
     /** Runs the Breakout program. */
     public void run() {
         this.setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
-        mainMenu();
         addMouseListeners();
+        while (true) {
+            mainMenu();
+            while (selectedLevel == null) {
+                pause(20);
+            }
+
+            currentLevel = selectedLevel;
+            selectedLevel = null;
+
+            removeAll();
+            currentLevel.setup();
+            currentLevel.play();
+
+            currentLevel = null;
+        }
     }
 
     private void mainMenu() {
@@ -91,37 +105,19 @@ public class Breakout extends GraphicsProgram {
         double y = e.getY();
 
         if (mainMenu.isLevel1Clicked(x, y)) {
-            removeAll();
-
-            Level1 level1 = new Level1(this);
-            level1.createBackground();
-            level1.createBricks();
-            drawPaddle();
-            level1.runLevel(paddle);
+            selectedLevel = new Level1(this);
         }
-    }
-
-    private void playLevelOne(){
-
     }
 
     public void mouseMoved(MouseEvent e) {
-        if (paddle == null) return;
-
-        int x = e.getX() - Breakout.PADDLE_WIDTH / 2;
-
-        if (x < 0) {
-            x = 0;
+        if (currentLevel != null) {
+            currentLevel.movePaddle(e.getX());
         }
-
-        if (x + Breakout.PADDLE_WIDTH > Breakout.APPLICATION_WIDTH) {
-            x = Breakout.APPLICATION_WIDTH - Breakout.PADDLE_WIDTH;
-        }
-
-        paddle.move(x);
     }
 
     private MainMenu mainMenu;
     private LevelButton level1Buttonl;
     private Paddle paddle;
+    private Level currentLevel;
+    private Level selectedLevel;
 }
