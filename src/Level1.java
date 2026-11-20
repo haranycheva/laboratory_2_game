@@ -1,24 +1,19 @@
-import acm.graphics.GRect;
+import acm.graphics.*;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import java.awt.*;
 import java.io.File;
 
-public class Level1 {
-
-    private Breakout game;
+public class Level1 extends Level{
 
     public Level1(Breakout game) {
-        this.game = game;
+        super(game);
     }
 
-    public void createBackground() {
-        GRect background = new GRect(0,0 , Breakout.APPLICATION_WIDTH, Breakout.APPLICATION_HEIGHT);
-        Color back = new Color(0xDBDFAC);
-        background.setFilled(true);
-        background.setFillColor(back);
-        game.addToBoard(background);
+    public void setupLevelOne(Paddle paddle){
+        this.setup();
+        createBricks();
     }
 
     public void createBricks() {
@@ -45,8 +40,8 @@ public class Level1 {
                 }
 
                 Brick brick = new Brick(x, y, color);
-
-                game.addToBoard(brick.getBrick());
+                this.increaseBrickAmount();
+                this.game.addToBoard(brick.getBrick());
             }
         }
     }
