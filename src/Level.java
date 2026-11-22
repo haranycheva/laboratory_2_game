@@ -1,14 +1,25 @@
 import acm.graphics.*;
+import acm.util.RandomGenerator;
+
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import java.awt.Color;
+import java.io.File;
 
 public class Level {
     protected Breakout game;
     protected Ball ball;
+    protected Ball secondBall;
+    protected Ball thirdBall;
     protected Paddle paddle;
     protected GRect background;
+    protected GameStats stats;
+    protected GRect statsWall;
 
     protected int bricksRemaining = 0;
     private boolean didWin = false;
+
+    private RandomGenerator rgen = RandomGenerator.getInstance();
 
     public Level(Breakout game) {
         this.game = game;
@@ -18,6 +29,10 @@ public class Level {
         bricksRemaining = 0;
         didWin = false;
         createBackground();
+        stats = new GameStats(game);
+        stats.drawLives();
+        stats.drawScore();
+        createStatsWall();
         createPaddle();
         createBricks();
         spawnBall();
@@ -27,13 +42,46 @@ public class Level {
         bricksRemaining+=1;
     }
 
+//    private void loadHitSound() {
+//        try {
+//            File file = new File("brickHit.wav");
+//            hitSound = AudioSystem.getClip();
+//            hitSound.open(AudioSystem.getAudioInputStream(file));
+//         } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    private void playHitSound() {
+//        if (hitSound != null && !hitSound.isRunning()) {
+//            hitSound.setFramePosition(0);
+//            hitSound.start();
+//        }
+//    }
+//
+//    private Clip hitSound;
+
     protected void onBrickDestroyed(GObject obj) {
         game.remove(obj);
         bricksRemaining--;
+        if (rgen.nextInt(1,5) == 1) {
+            if (secondBall == null) {
+                secondBall = new Ball(game, Breakout.WIDTH / 2.0, Breakout.HEIGHT / 2.0);
+                secondBall.setColor(Color.RED);
+                configureBall(secondBall);
+                game.addToBoard(secondBall);
+            } else if (thirdBall == null) {
+                thirdBall = new Ball(game, Breakout.WIDTH / 2.0, Breakout.HEIGHT / 2.0);
+                thirdBall.setColor(Color.RED);
+                configureBall(thirdBall);
+                game.addToBoard(thirdBall);
+            }
+        }
         if (bricksRemaining <= 0) {
             bricksRemaining = 0;
             didWin = true;
         }
+        stats.increaseScore();
     }
 
     public boolean didWin() {
@@ -43,19 +91,56 @@ public class Level {
     public void createBricks() {
     }
 
+    protected void createStatsWall() {
+        statsWall = new GRect(0, 65, Breakout.APPLICATION_WIDTH, 5);
+        statsWall.setFilled(true);
+        statsWall.setFillColor(Color.BLACK);
+
+        game.addToBoard(statsWall);
+    }
+
     public void play() {
         boolean isRunning = true;
         while (isRunning) {
             int boardWidth = (game.getWidth() > 0) ? game.getWidth() : Breakout.WIDTH;
             ball.moveAndBounceWalls(boardWidth);
 
+            if (secondBall != null) {
+                secondBall.moveAndBounceWalls(boardWidth);
+
+                if (secondBall.isHitBottom(Breakout.HEIGHT)) {
+                    game.remove(secondBall);
+                    secondBall.clearTrail();
+                    secondBall = null;
+                } else {
+                    checkCollisions(secondBall);
+                }
+            }
+
+            if (thirdBall != null) {
+                thirdBall.moveAndBounceWalls(boardWidth);
+
+                if (thirdBall.isHitBottom(Breakout.HEIGHT)) {
+                    game.remove(thirdBall);
+                    thirdBall.clearTrail();
+                    thirdBall = null;
+                } else {
+                    checkCollisions(thirdBall);
+                }
+            }
+
             if (ball.isHitBottom(Breakout.HEIGHT)) {
                 game.remove(ball);
+                ball.clearTrail();
                 ball = null;
-                isRunning = false;
-                gameOver();
+                if (stats.decreaseLives()) {
+                    isRunning = false;
+                    gameOver();
+                } else {
+                    spawnBall();
+                }
             } else {
-                checkCollisions();
+                checkCollisions(ball);
             }
 
             if(didWin){
@@ -63,7 +148,6 @@ public class Level {
                 ball = null;
                 isRunning = false;
                 gameWon();
-                continue;
             }
 
             game.pause(20);
@@ -91,8 +175,6 @@ public class Level {
         game.addToBoard(background);
     }
 
-
-
     private void createPaddle() {
         double x = (game.getWidth() - Breakout.PADDLE_WIDTH) / 2.0;
         double y = game.getHeight() - Breakout.PADDLE_HEIGHT - Breakout.PADDLE_Y_OFFSET;
@@ -103,61 +185,89 @@ public class Level {
         if (ball != null) {
             game.remove(ball);
         }
-        ball = new Ball(Breakout.WIDTH / 2.0, Breakout.HEIGHT / 2.0);
+        ball = new Ball(game,Breakout.WIDTH / 2.0, Breakout.HEIGHT / 2.0);
+        configureBall(ball);
         game.addToBoard(ball);
     }
 
-    protected void checkCollisions() {
-        if (ball == null) return;
+    protected boolean isBrick(GObject object) {
+        return false;
+    }
 
-        double bx = ball.getX();
-        double by = ball.getY();
-        double r = ball.getRadius();
+    protected void checkCollisions(Ball currentBall) {
+        if (currentBall == null) return;
+
+        double bx = currentBall.getX();
+        double by = currentBall.getY();
+        double r = currentBall.getRadius();
         GObject paddleObj = paddle.getPaddle();
 
         GObject bottomObj = game.getElementAt(bx, by + r + 1);
-        if (bottomObj != null && bottomObj != ball && bottomObj != background) {
+        if (bottomObj != null && (bottomObj == paddleObj || isBrick(bottomObj))) {
             if (bottomObj == paddleObj) {
-                ball.setLocation(bx, paddleObj.getY() - r - 1);
+                currentBall.setLocation(bx, paddleObj.getY() - r - 1);
             } else {
                 onBrickDestroyed(bottomObj);
             }
-            ball.bounceY();
+            currentBall.bounceY();
             return;
         }
 
         GObject topObj = game.getElementAt(bx, by - r - 1);
-        if (topObj != null && topObj != ball && topObj != background) {
-            if (topObj != paddleObj){
+        if (topObj != null && (topObj == statsWall || isBrick(topObj))) {
+            if (isBrick(topObj)){
                 onBrickDestroyed(topObj);
             }
-            ball.bounceY();
+            currentBall.bounceY();
             return;
         }
 
         GObject leftObj = game.getElementAt(bx - r - 1, by);
-        if (leftObj != null && leftObj != ball && leftObj != background) {
-            if (leftObj != paddleObj) {
+        if (leftObj != null && leftObj != currentBall && leftObj != background) {
+            if (isBrick(leftObj)) {
                 onBrickDestroyed(leftObj);
             }
-            ball.bounceX();
+            currentBall.bounceX();
             return;
         }
 
         GObject rightObj = game.getElementAt(bx + r + 1, by);
-        if (rightObj != null && rightObj != ball && rightObj != background) {
-            if (rightObj != paddleObj){
+        if (rightObj != null && rightObj != currentBall && rightObj != background) {
+            if (isBrick(rightObj)){
                 onBrickDestroyed(rightObj);
             }
-            ball.bounceX();
+            currentBall.bounceX();
         }
     }
 
+    protected void configureBall(Ball newball) {
+
+    }
+
     public void gameOver() {
+        game.setGameOver(true);
+
+        GImage gameOverImage = new GImage("gameOver.png");
+        gameOverImage.setSize(300, 90);
+
+        double x = (Breakout.APPLICATION_WIDTH - 300) / 2.0;
+        double y = (Breakout.APPLICATION_HEIGHT - 150) / 2.0;
+
+        gameOverImage.setLocation(x, y);
+        game.addToBoard(gameOverImage);
     }
 
     public void gameWon(){
+        game.setGameOver(true);
 
+        GImage gameWinImage = new GImage("gameWin.png");
+        gameWinImage.setSize(300, 90);
+
+        double x = (Breakout.APPLICATION_WIDTH - 300) / 2.0;
+        double y = (Breakout.APPLICATION_HEIGHT - 150) / 2.0;
+
+        gameWinImage.setLocation(x, y);
+        game.addToBoard(gameWinImage);
     }
 
 }
