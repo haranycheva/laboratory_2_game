@@ -14,6 +14,8 @@ public class MainMenu {
 
     private Breakout game;
     private LevelButton level1;
+    private LevelButton level2;
+    private LevelButton level3;
 
     public MainMenu(Breakout game) {
         this.game = game;
@@ -80,8 +82,8 @@ public class MainMenu {
         int levelY = 300;
         int gap = 30;
         level1 = new LevelButton(game, levelX, levelY, "LEVEL 1", new Color(0x391F28));
-        LevelButton level2 = new LevelButton(game, levelX, levelY + 45 + gap, "LEVEL 2", new Color(0x761D2F));
-        LevelButton level3 = new LevelButton(game, levelX, levelY + 2 * (45 + gap), "LEVEL 3", new Color(0xA51B33));
+        level2 = new LevelButton(game, levelX, levelY + 45 + gap, "LEVEL 2", new Color(0x761D2F));
+        level3 = new LevelButton(game, levelX, levelY + 2 * (45 + gap), "LEVEL 3", new Color(0xA51B33));
         level1.addToBoard();
         level2.addToBoard();
         level3.addToBoard();
@@ -114,6 +116,22 @@ public class MainMenu {
 
     public boolean isLevel1Clicked(double x, double y) {
         if (level1.contains(x, y)) {
+            stopMainMenuMusic();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isLevel2Clicked(double x, double y) {
+        if (level2.contains(x, y)) {
+            stopMainMenuMusic();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isLevel3Clicked(double x, double y) {
+        if (level3.contains(x, y)) {
             stopMainMenuMusic();
             return true;
         }
