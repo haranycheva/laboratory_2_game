@@ -68,6 +68,15 @@ public class Level {
 //    private Clip hitSound;
 
     protected void onBrickDestroyed(GObject obj) {
+        if (!(obj instanceof Brick)) return;
+        Brick brick = (Brick) obj;
+        brick.hit();
+
+        if (!brick.isDestroyed()) {
+            // опційно: можна трохи змінити колір або підсвітити, що життя зменшилось
+            return;
+        }
+
         game.remove(obj);
         bricksRemaining--;
         if (multiBallEnabled && rgen.nextInt(1,5) == 1) {
@@ -235,6 +244,9 @@ public class Level {
                 currentBall.setLocation(bx, paddleObj.getY() - r - 1);
             } else {
                 onBrickDestroyed(bottomObj);
+                if (bottomObj.getParent() != null) {
+                    currentBall.setLocation(bx, bottomObj.getY() - r - 1);
+                }
             }
             currentBall.bounceY();
             return;
@@ -242,8 +254,11 @@ public class Level {
 
         GObject topObj = game.getElementAt(bx, by - r - 1);
         if (topObj != null && (topObj == statsWall || isBrick(topObj))) {
-            if (isBrick(topObj)){
+            if (isBrick(topObj)) {
                 onBrickDestroyed(topObj);
+                if (topObj.getParent() != null) {
+                    currentBall.setLocation(bx, topObj.getY() + topObj.getHeight() + r + 1);
+                }
             }
             currentBall.bounceY();
             return;
@@ -253,6 +268,9 @@ public class Level {
         if (leftObj != null && leftObj != currentBall && leftObj != background) {
             if (isBrick(leftObj)) {
                 onBrickDestroyed(leftObj);
+                if (leftObj.getParent() != null) {
+                    currentBall.setLocation(leftObj.getX() - r - 1, by);
+                }
             }
             currentBall.bounceX();
             return;
@@ -260,8 +278,11 @@ public class Level {
 
         GObject rightObj = game.getElementAt(bx + r + 1, by);
         if (rightObj != null && rightObj != currentBall && rightObj != background) {
-            if (isBrick(rightObj)){
+            if (isBrick(rightObj)) {
                 onBrickDestroyed(rightObj);
+                if (rightObj.getParent() != null) {
+                    currentBall.setLocation(rightObj.getX() + rightObj.getWidth() + r + 1, by);
+                }
             }
             currentBall.bounceX();
         }
