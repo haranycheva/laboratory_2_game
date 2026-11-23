@@ -4,7 +4,7 @@ import java.awt.*;
 public class Level1 extends Level {
 
     public Level1(Breakout game) {
-        super(game);
+        super(game, false);
     }
 
     public void createBricks() {

@@ -18,11 +18,17 @@ public class Level {
 
     protected int bricksRemaining = 0;
     private boolean didWin = false;
+    private boolean multiBallEnabled = true;
 
     private RandomGenerator rgen = RandomGenerator.getInstance();
 
     public Level(Breakout game) {
         this.game = game;
+    }
+
+    public Level(Breakout game, boolean multiBallEnabled) {
+        this.game = game;
+        this.multiBallEnabled = multiBallEnabled;
     }
 
     public void setup() {
@@ -64,7 +70,7 @@ public class Level {
     protected void onBrickDestroyed(GObject obj) {
         game.remove(obj);
         bricksRemaining--;
-        if (rgen.nextInt(1,5) == 1) {
+        if (multiBallEnabled && rgen.nextInt(1,5) == 1) {
             if (secondBall == null) {
                 secondBall = new Ball(game, Breakout.WIDTH / 2.0, Breakout.HEIGHT / 2.0);
                 secondBall.setColor(Color.RED);
