@@ -103,11 +103,20 @@ public class Level {
         boolean isRunning = true;
         while (isRunning) {
             int boardWidth = (game.getWidth() > 0) ? game.getWidth() : Breakout.WIDTH;
-            ball.moveAndBounceWalls(boardWidth);
+
+            if (ball != null) {
+                ball.moveAndBounceWalls(boardWidth);
+                if (ball.isHitBottom(Breakout.HEIGHT)) {
+                    game.remove(ball);
+                    ball.clearTrail();
+                    ball = null;
+                } else {
+                    checkCollisions(ball);
+                }
+            }
 
             if (secondBall != null) {
                 secondBall.moveAndBounceWalls(boardWidth);
-
                 if (secondBall.isHitBottom(Breakout.HEIGHT)) {
                     game.remove(secondBall);
                     secondBall.clearTrail();
@@ -119,7 +128,6 @@ public class Level {
 
             if (thirdBall != null) {
                 thirdBall.moveAndBounceWalls(boardWidth);
-
                 if (thirdBall.isHitBottom(Breakout.HEIGHT)) {
                     game.remove(thirdBall);
                     thirdBall.clearTrail();
@@ -129,28 +137,41 @@ public class Level {
                 }
             }
 
-            if (ball.isHitBottom(Breakout.HEIGHT)) {
-                game.remove(ball);
-                ball.clearTrail();
-                ball = null;
+            if (didWin) {
+                removeAllBalls();
+                isRunning = false;
+                gameWon();
+                break;
+            }
+
+            if (ball == null && secondBall == null && thirdBall == null) {
                 if (stats.decreaseLives()) {
                     isRunning = false;
                     gameOver();
                 } else {
                     spawnBall();
                 }
-            } else {
-                checkCollisions(ball);
-            }
-
-            if(didWin){
-                game.remove(ball);
-                ball = null;
-                isRunning = false;
-                gameWon();
             }
 
             game.pause(20);
+        }
+    }
+
+    private void removeAllBalls() {
+        if (ball != null) {
+            game.remove(ball);
+            ball.clearTrail();
+            ball = null;
+        }
+        if (secondBall != null) {
+            game.remove(secondBall);
+            secondBall.clearTrail();
+            secondBall = null;
+        }
+        if (thirdBall != null) {
+            game.remove(thirdBall);
+            thirdBall.clearTrail();
+            thirdBall = null;
         }
     }
 
