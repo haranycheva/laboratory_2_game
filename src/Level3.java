@@ -4,18 +4,73 @@ import acm.util.RandomGenerator;
 import java.awt.*;
 
 public class Level3 extends Level {
+    private int shiftCounter = 0;
+    private int shiftIntervalTicks = 120; // ~8 секунд при pause(20)
+    private double shiftAmountY = 12.0;
+
     public Level3(Breakout game) {
         super(game);
     }
 
     private RandomGenerator rgen = RandomGenerator.getInstance();
 
+    @Override
+    public void setup() {
+        super.setup();
+        shiftCounter = 0;
+    }
+
+    @Override
+    public void onTick() {
+        shiftCounter++;
+        if (shiftCounter >= shiftIntervalTicks) {
+            shiftCounter = 0;
+            shiftBricksDown();
+        }
+    }
+
+    private void shiftBricksDown() {
+        double totalRowWidth = Breakout.NBRICKS_PER_ROW * Breakout.BRICK_WIDTH
+                + (Breakout.NBRICKS_PER_ROW - 1) * Breakout.BRICK_SEP;
+        double startX = (Breakout.WIDTH - totalRowWidth) / 2.0;
+        double stepX = Breakout.BRICK_WIDTH + Breakout.BRICK_SEP;
+
+        double paddleLimitY = paddle.getPaddle().getY() - Breakout.BRICK_HEIGHT - 25;
+
+        for (int col = 0; col < Breakout.NBRICKS_PER_ROW; col++) {
+            double sampleX = startX + col * stepX + Breakout.BRICK_WIDTH / 2.0;
+            double lowestAllowedY = paddleLimitY;
+            Brick lastBrick = null;
+
+            for (int yScan = (int) paddleLimitY + Breakout.BRICK_HEIGHT; yScan >= 72; yScan -= 3) {
+                GObject obj = game.getElementAt(sampleX, yScan);
+                if (!(obj instanceof Brick)) {
+                    continue;
+                }
+
+                Brick b = (Brick) obj;
+                if (b == lastBrick) {
+                    continue;
+                }
+                lastBrick = b;
+
+                double desiredY = b.getY() + shiftAmountY;
+                double newY = Math.min(desiredY, lowestAllowedY);
+
+                if (newY > b.getY()) {
+                    b.setLocation(b.getX(), newY);
+                }
+                lowestAllowedY = b.getY() - Breakout.BRICK_HEIGHT - Breakout.BRICK_SEP;
+            }
+        }
+    }
+
     public void createBricks() {
         double totalRowWidth = Breakout.NBRICKS_PER_ROW * Breakout.BRICK_WIDTH + (Breakout.NBRICKS_PER_ROW - 1) * Breakout.BRICK_SEP;
         double startX = (Breakout.WIDTH - totalRowWidth) / 2.0;
 
-        for (int i = 0; i < Breakout.NBRICK_ROWS; i++) { // рядки
-            for (int j = 0; j < Breakout.NBRICKS_PER_ROW; j++) { // стовпці
+        for (int i = 0; i < Breakout.NBRICK_ROWS; i++) {
+            for (int j = 0; j < Breakout.NBRICKS_PER_ROW; j++) {
                 double x = startX + j * (Breakout.BRICK_WIDTH + Breakout.BRICK_SEP);
                 int y = Breakout.BRICK_Y_OFFSET + i * (Breakout.BRICK_HEIGHT + Breakout.BRICK_SEP);
 

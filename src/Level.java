@@ -73,7 +73,6 @@ public class Level {
         brick.hit();
 
         if (!brick.isDestroyed()) {
-            // опційно: можна трохи змінити колір або підсвітити, що життя зменшилось
             return;
         }
 
@@ -168,7 +167,7 @@ public class Level {
                     spawnBall();
                 }
             }
-
+            onTick();
             game.pause(20);
         }
     }
@@ -317,6 +316,9 @@ public class Level {
 
         gameWinImage.setLocation(x, y);
         game.addToBoard(gameWinImage);
+    }
+
+    public void onTick() {
     }
 
 }
