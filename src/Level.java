@@ -32,6 +32,7 @@ public class Level {
     }
 
     public void setup() {
+        loadHitSound();
         bricksRemaining = 0;
         didWin = false;
         createBackground();
@@ -48,30 +49,31 @@ public class Level {
         bricksRemaining+=1;
     }
 
-//    private void loadHitSound() {
-//        try {
-//            File file = new File("brickHit.wav");
-//            hitSound = AudioSystem.getClip();
-//            hitSound.open(AudioSystem.getAudioInputStream(file));
-//         } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private void playHitSound() {
-//        if (hitSound != null && !hitSound.isRunning()) {
-//            hitSound.setFramePosition(0);
-//            hitSound.start();
-//        }
-//    }
-//
-//    private Clip hitSound;
+    private void loadHitSound() {
+        try {
+            File file = new File("brickHit.wav");
+            hitSound = AudioSystem.getClip();
+            hitSound.open(AudioSystem.getAudioInputStream(file));
+         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void playHitSound() {
+        if (hitSound != null) {
+            hitSound.stop();
+            hitSound.setFramePosition(0);
+            hitSound.start();
+        }
+    }
+
+    private Clip hitSound;
 
     protected void onBrickDestroyed(GObject obj) {
         if (!(obj instanceof Brick)) return;
         Brick brick = (Brick) obj;
         brick.hit();
-
+        playHitSound();
         if (!brick.isDestroyed()) {
             return;
         }
