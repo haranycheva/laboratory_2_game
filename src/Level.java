@@ -24,6 +24,7 @@ public class Level {
     private Clip levelMusic;
     private Clip gameOverSound;
     private Clip gameWinSound;
+    private Clip lifeLostSound;
 
     private RandomGenerator rgen = RandomGenerator.getInstance();
 
@@ -55,6 +56,7 @@ public class Level {
         levelMusic = loadSingleSound("shreksophone.wav");
         gameOverSound = loadSingleSound("gameOver.wav");
         gameWinSound = loadSingleSound("gameWin.wav");
+        lifeLostSound = loadSingleSound("lifeLost.wav");
     }
 
     public void increaseBrickAmount(){
@@ -199,6 +201,7 @@ public class Level {
                     isRunning = false;
                     gameOver();
                 } else {
+                    playSingleSound(lifeLostSound);
                     spawnBall();
                 }
             }
