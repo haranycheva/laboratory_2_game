@@ -24,6 +24,7 @@ public class Level {
     private Clip levelMusic;
     private Clip gameOverSound;
     private Clip gameWinSound;
+    private Clip lifeLostSound;
 
     private RandomGenerator rgen = RandomGenerator.getInstance();
 
@@ -55,6 +56,7 @@ public class Level {
         levelMusic = loadSingleSound("shreksophone.wav");
         gameOverSound = loadSingleSound("gameOver.wav");
         gameWinSound = loadSingleSound("gameWin.wav");
+        lifeLostSound = loadSingleSound("lifeLost.wav");
     }
 
     public void increaseBrickAmount(){
@@ -199,6 +201,7 @@ public class Level {
                     isRunning = false;
                     gameOver();
                 } else {
+                    playSingleSound(lifeLostSound);
                     spawnBall();
                 }
             }
@@ -266,59 +269,49 @@ public class Level {
     }
 
     protected void checkCollisions(Ball currentBall) {
-        if (currentBall == null) return;
+        if (currentBall == null || paddle == null) return;
 
         double bx = currentBall.getX();
         double by = currentBall.getY();
         double r = currentBall.getRadius();
         GObject paddleObj = paddle.getPaddle();
-
-        GObject bottomObj = game.getElementAt(bx, by + r + 1);
+        
+        GObject bottomObj = game.getElementAt(bx, by + r + 2);
         if (bottomObj != null && (bottomObj == paddleObj || isBrick(bottomObj))) {
             if (bottomObj == paddleObj) {
-                currentBall.setLocation(bx, paddleObj.getY() - r - 1);
+                currentBall.setLocation(bx, paddleObj.getY() - r - 2);
             } else {
+                currentBall.setLocation(bx, bottomObj.getY() - r - 2);
                 onBrickDestroyed(bottomObj);
-                if (bottomObj.getParent() != null) {
-                    currentBall.setLocation(bx, bottomObj.getY() - r - 1);
-                }
             }
             currentBall.bounceY();
             return;
         }
 
-        GObject topObj = game.getElementAt(bx, by - r - 1);
+        GObject topObj = game.getElementAt(bx, by - r - 2);
         if (topObj != null && (topObj == statsWall || isBrick(topObj))) {
             if (isBrick(topObj)) {
+                currentBall.setLocation(bx, topObj.getY() + topObj.getHeight() + r + 2);
                 onBrickDestroyed(topObj);
-                if (topObj.getParent() != null) {
-                    currentBall.setLocation(bx, topObj.getY() + topObj.getHeight() + r + 1);
-                }
+            } else {
+                currentBall.setLocation(bx, statsWall.getY() + statsWall.getHeight() + r + 2);
             }
             currentBall.bounceY();
             return;
         }
 
-        GObject leftObj = game.getElementAt(bx - r - 1, by);
-        if (leftObj != null && leftObj != currentBall && leftObj != background) {
-            if (isBrick(leftObj)) {
-                onBrickDestroyed(leftObj);
-                if (leftObj.getParent() != null) {
-                    currentBall.setLocation(leftObj.getX() - r - 1, by);
-                }
-            }
+        GObject leftObj = game.getElementAt(bx - r - 2, by);
+        if (leftObj != null && isBrick(leftObj)) {
+            currentBall.setLocation(leftObj.getX() + leftObj.getWidth() + r + 2, by);
+            onBrickDestroyed(leftObj);
             currentBall.bounceX();
             return;
         }
 
-        GObject rightObj = game.getElementAt(bx + r + 1, by);
-        if (rightObj != null && rightObj != currentBall && rightObj != background) {
-            if (isBrick(rightObj)) {
-                onBrickDestroyed(rightObj);
-                if (rightObj.getParent() != null) {
-                    currentBall.setLocation(rightObj.getX() + rightObj.getWidth() + r + 1, by);
-                }
-            }
+        GObject rightObj = game.getElementAt(bx + r + 2, by);
+        if (rightObj != null && isBrick(rightObj)) {
+            currentBall.setLocation(rightObj.getX() - r - 2, by);
+            onBrickDestroyed(rightObj);
             currentBall.bounceX();
         }
     }

@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class Level3 extends Level {
     private int shiftCounter = 0;
-    private int shiftIntervalTicks = 120; // ~8 секунд при pause(20)
+    private int shiftIntervalTicks = 250; 
     private double shiftAmountY = 12.0;
 
     public Level3(Breakout game) {
