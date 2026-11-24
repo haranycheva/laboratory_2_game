@@ -4,7 +4,7 @@ import java.awt.*;
 public class Level1 extends Level {
 
     public Level1(Breakout game) {
-        super(game);
+        super(game, false);
     }
 
     public void createBricks() {
@@ -35,24 +35,5 @@ public class Level1 extends Level {
                 this.game.addToBoard(brick);
             }
         }
-    }
-
-    protected boolean isBrick(GObject object) {
-        double totalRowWidth = Breakout.NBRICKS_PER_ROW * Breakout.BRICK_WIDTH + (Breakout.NBRICKS_PER_ROW - 1) * Breakout.BRICK_SEP;
-        double startX = (Breakout.WIDTH - totalRowWidth) / 2.0;
-
-        for (int i = 0; i < Breakout.NBRICK_ROWS; i++) { // рядки
-            for (int j = 0; j < Breakout.NBRICKS_PER_ROW; j++) { // стовпці
-                double x = startX + j * (Breakout.BRICK_WIDTH + Breakout.BRICK_SEP);
-                int y = Breakout.BRICK_Y_OFFSET + i * (Breakout.BRICK_HEIGHT + Breakout.BRICK_SEP);
-
-                if (Math.abs(object.getX() - x) < 0.001
-                        && Math.abs(object.getY() - y) < 0.001) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }

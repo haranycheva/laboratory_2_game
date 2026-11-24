@@ -18,6 +18,12 @@ public class Level {
 
     protected int bricksRemaining = 0;
     private boolean didWin = false;
+    private boolean multiBallEnabled = true;
+
+    private Clip hitSound;
+    private Clip levelMusic;
+    private Clip gameOverSound;
+    private Clip gameWinSound;
 
     private RandomGenerator rgen = RandomGenerator.getInstance();
 
@@ -25,7 +31,13 @@ public class Level {
         this.game = game;
     }
 
+    public Level(Breakout game, boolean multiBallEnabled) {
+        this.game = game;
+        this.multiBallEnabled = multiBallEnabled;
+    }
+
     public void setup() {
+        loadSounds();
         bricksRemaining = 0;
         didWin = false;
         createBackground();
@@ -38,33 +50,69 @@ public class Level {
         spawnBall();
     }
 
+    private void loadSounds(){
+        hitSound = loadSingleSound("brickHit.wav");
+        levelMusic = loadSingleSound("shreksophone.wav");
+        gameOverSound = loadSingleSound("gameOver.wav");
+        gameWinSound = loadSingleSound("gameWin.wav");
+    }
+
     public void increaseBrickAmount(){
         bricksRemaining+=1;
     }
 
-//    private void loadHitSound() {
-//        try {
-//            File file = new File("brickHit.wav");
-//            hitSound = AudioSystem.getClip();
-//            hitSound.open(AudioSystem.getAudioInputStream(file));
-//         } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private void playHitSound() {
-//        if (hitSound != null && !hitSound.isRunning()) {
-//            hitSound.setFramePosition(0);
-//            hitSound.start();
-//        }
-//    }
-//
-//    private Clip hitSound;
+    private Clip loadSingleSound(String fileName) {
+        try {
+            File file = new File(fileName);
+            if (!file.exists()) return null;
+            Clip clip = AudioSystem.getClip();
+            clip.open(AudioSystem.getAudioInputStream(file));
+            return clip;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void playSingleSound(Clip clip) {
+        if (clip != null) {
+            if (clip.isRunning()) {
+                clip.stop();
+            }
+            clip.setFramePosition(0);
+            clip.start();
+        }
+    }
+
+    protected void startLevelMusic() {
+        if (levelMusic != null && !levelMusic.isRunning()) {
+            levelMusic.setFramePosition(0);
+            levelMusic.loop(Clip.LOOP_CONTINUOUSLY);
+        }
+    }
+
+    protected void stopLevelMusic() {
+        if (levelMusic != null) {
+            if (levelMusic.isRunning()) {
+                levelMusic.stop();
+            }
+            levelMusic.close();
+            levelMusic = null;
+        }
+    }
 
     protected void onBrickDestroyed(GObject obj) {
+        if (!(obj instanceof Brick)) return;
+        Brick brick = (Brick) obj;
+        brick.hit();
+        playSingleSound(hitSound);
+        if (!brick.isDestroyed()) {
+            return;
+        }
+
         game.remove(obj);
         bricksRemaining--;
-        if (rgen.nextInt(1,5) == 1) {
+        if (multiBallEnabled && rgen.nextInt(1,5) == 1) {
             if (secondBall == null) {
                 secondBall = new Ball(game, Breakout.WIDTH / 2.0, Breakout.HEIGHT / 2.0);
                 secondBall.setColor(Color.RED);
@@ -91,6 +139,7 @@ public class Level {
     public void createBricks() {
     }
 
+
     protected void createStatsWall() {
         statsWall = new GRect(0, 65, Breakout.APPLICATION_WIDTH, 5);
         statsWall.setFilled(true);
@@ -100,14 +149,24 @@ public class Level {
     }
 
     public void play() {
+        startLevelMusic();
         boolean isRunning = true;
         while (isRunning) {
             int boardWidth = (game.getWidth() > 0) ? game.getWidth() : Breakout.WIDTH;
-            ball.moveAndBounceWalls(boardWidth);
+
+            if (ball != null) {
+                ball.moveAndBounceWalls(boardWidth);
+                if (ball.isHitBottom(Breakout.HEIGHT)) {
+                    game.remove(ball);
+                    ball.clearTrail();
+                    ball = null;
+                } else {
+                    checkCollisions(ball);
+                }
+            }
 
             if (secondBall != null) {
                 secondBall.moveAndBounceWalls(boardWidth);
-
                 if (secondBall.isHitBottom(Breakout.HEIGHT)) {
                     game.remove(secondBall);
                     secondBall.clearTrail();
@@ -119,7 +178,6 @@ public class Level {
 
             if (thirdBall != null) {
                 thirdBall.moveAndBounceWalls(boardWidth);
-
                 if (thirdBall.isHitBottom(Breakout.HEIGHT)) {
                     game.remove(thirdBall);
                     thirdBall.clearTrail();
@@ -129,28 +187,41 @@ public class Level {
                 }
             }
 
-            if (ball.isHitBottom(Breakout.HEIGHT)) {
-                game.remove(ball);
-                ball.clearTrail();
-                ball = null;
+            if (didWin) {
+                removeAllBalls();
+                isRunning = false;
+                gameWon();
+                break;
+            }
+
+            if (ball == null && secondBall == null && thirdBall == null) {
                 if (stats.decreaseLives()) {
                     isRunning = false;
                     gameOver();
                 } else {
                     spawnBall();
                 }
-            } else {
-                checkCollisions(ball);
             }
-
-            if(didWin){
-                game.remove(ball);
-                ball = null;
-                isRunning = false;
-                gameWon();
-            }
-
+            onTick();
             game.pause(20);
+        }
+    }
+
+    private void removeAllBalls() {
+        if (ball != null) {
+            game.remove(ball);
+            ball.clearTrail();
+            ball = null;
+        }
+        if (secondBall != null) {
+            game.remove(secondBall);
+            secondBall.clearTrail();
+            secondBall = null;
+        }
+        if (thirdBall != null) {
+            game.remove(thirdBall);
+            thirdBall.clearTrail();
+            thirdBall = null;
         }
     }
 
@@ -191,7 +262,7 @@ public class Level {
     }
 
     protected boolean isBrick(GObject object) {
-        return false;
+        return object instanceof  Brick;
     }
 
     protected void checkCollisions(Ball currentBall) {
@@ -208,6 +279,9 @@ public class Level {
                 currentBall.setLocation(bx, paddleObj.getY() - r - 1);
             } else {
                 onBrickDestroyed(bottomObj);
+                if (bottomObj.getParent() != null) {
+                    currentBall.setLocation(bx, bottomObj.getY() - r - 1);
+                }
             }
             currentBall.bounceY();
             return;
@@ -215,8 +289,11 @@ public class Level {
 
         GObject topObj = game.getElementAt(bx, by - r - 1);
         if (topObj != null && (topObj == statsWall || isBrick(topObj))) {
-            if (isBrick(topObj)){
+            if (isBrick(topObj)) {
                 onBrickDestroyed(topObj);
+                if (topObj.getParent() != null) {
+                    currentBall.setLocation(bx, topObj.getY() + topObj.getHeight() + r + 1);
+                }
             }
             currentBall.bounceY();
             return;
@@ -226,6 +303,9 @@ public class Level {
         if (leftObj != null && leftObj != currentBall && leftObj != background) {
             if (isBrick(leftObj)) {
                 onBrickDestroyed(leftObj);
+                if (leftObj.getParent() != null) {
+                    currentBall.setLocation(leftObj.getX() - r - 1, by);
+                }
             }
             currentBall.bounceX();
             return;
@@ -233,8 +313,11 @@ public class Level {
 
         GObject rightObj = game.getElementAt(bx + r + 1, by);
         if (rightObj != null && rightObj != currentBall && rightObj != background) {
-            if (isBrick(rightObj)){
+            if (isBrick(rightObj)) {
                 onBrickDestroyed(rightObj);
+                if (rightObj.getParent() != null) {
+                    currentBall.setLocation(rightObj.getX() + rightObj.getWidth() + r + 1, by);
+                }
             }
             currentBall.bounceX();
         }
@@ -245,6 +328,8 @@ public class Level {
     }
 
     public void gameOver() {
+        stopLevelMusic();
+        playSingleSound(gameOverSound);
         game.setGameOver(true);
 
         GImage gameOverImage = new GImage("gameOver.png");
@@ -258,6 +343,8 @@ public class Level {
     }
 
     public void gameWon(){
+        stopLevelMusic();
+        playSingleSound(gameWinSound);
         game.setGameOver(true);
 
         GImage gameWinImage = new GImage("gameWin.png");
@@ -268,6 +355,9 @@ public class Level {
 
         gameWinImage.setLocation(x, y);
         game.addToBoard(gameWinImage);
+    }
+
+    public void onTick() {
     }
 
 }
