@@ -106,6 +106,7 @@ public class Level {
     public void createBricks() {
     }
 
+
     protected void createStatsWall() {
         statsWall = new GRect(0, 65, Breakout.APPLICATION_WIDTH, 5);
         statsWall.setFilled(true);
@@ -227,7 +228,7 @@ public class Level {
     }
 
     protected boolean isBrick(GObject object) {
-        return false;
+        return object instanceof  Brick;
     }
 
     protected void checkCollisions(Ball currentBall) {
