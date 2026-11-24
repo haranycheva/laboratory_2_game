@@ -22,6 +22,8 @@ public class Level {
 
     private Clip hitSound;
     private Clip levelMusic;
+    private Clip gameOverSound;
+    private Clip gameWinSound;
 
     private RandomGenerator rgen = RandomGenerator.getInstance();
 
@@ -49,40 +51,36 @@ public class Level {
     }
 
     private void loadSounds(){
-        loadHitSound();
-        loadLevelMusic();
+        hitSound = loadSingleSound("brickHit.wav");
+        levelMusic = loadSingleSound("shreksophone.wav");
+        gameOverSound = loadSingleSound("gameOver.wav");
+        gameWinSound = loadSingleSound("gameWin.wav");
     }
 
     public void increaseBrickAmount(){
         bricksRemaining+=1;
     }
 
-    private void loadHitSound() {
+    private Clip loadSingleSound(String fileName) {
         try {
-            File file = new File("brickHit.wav");
-            hitSound = AudioSystem.getClip();
-            hitSound.open(AudioSystem.getAudioInputStream(file));
-         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void playHitSound() {
-        if (hitSound != null) {
-            hitSound.stop();
-            hitSound.setFramePosition(0);
-            hitSound.start();
-        }
-    }
-
-    protected void loadLevelMusic() {
-        try {
-            File file = new File("shreksophone.wav");
-            if (!file.exists()) return;
-            levelMusic = AudioSystem.getClip();
-            levelMusic.open(AudioSystem.getAudioInputStream(file));
+            File file = new File(fileName);
+            if (!file.exists()) return null;
+            Clip clip = AudioSystem.getClip();
+            clip.open(AudioSystem.getAudioInputStream(file));
+            return clip;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void playSingleSound(Clip clip) {
+        if (clip != null) {
+            if (clip.isRunning()) {
+                clip.stop();
+            }
+            clip.setFramePosition(0);
+            clip.start();
         }
     }
 
@@ -107,7 +105,7 @@ public class Level {
         if (!(obj instanceof Brick)) return;
         Brick brick = (Brick) obj;
         brick.hit();
-        playHitSound();
+        playSingleSound(hitSound);
         if (!brick.isDestroyed()) {
             return;
         }
@@ -330,6 +328,8 @@ public class Level {
     }
 
     public void gameOver() {
+        stopLevelMusic();
+        playSingleSound(gameOverSound);
         game.setGameOver(true);
 
         GImage gameOverImage = new GImage("gameOver.png");
@@ -340,11 +340,11 @@ public class Level {
 
         gameOverImage.setLocation(x, y);
         game.addToBoard(gameOverImage);
-
-        stopLevelMusic();
     }
 
     public void gameWon(){
+        stopLevelMusic();
+        playSingleSound(gameWinSound);
         game.setGameOver(true);
 
         GImage gameWinImage = new GImage("gameWin.png");
@@ -355,8 +355,6 @@ public class Level {
 
         gameWinImage.setLocation(x, y);
         game.addToBoard(gameWinImage);
-
-        stopLevelMusic();
     }
 
     public void onTick() {
