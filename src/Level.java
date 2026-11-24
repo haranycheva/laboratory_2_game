@@ -20,6 +20,9 @@ public class Level {
     private boolean didWin = false;
     private boolean multiBallEnabled = true;
 
+    private Clip hitSound;
+    private Clip levelMusic;
+
     private RandomGenerator rgen = RandomGenerator.getInstance();
 
     public Level(Breakout game) {
@@ -32,7 +35,7 @@ public class Level {
     }
 
     public void setup() {
-        loadHitSound();
+        loadSounds();
         bricksRemaining = 0;
         didWin = false;
         createBackground();
@@ -43,6 +46,11 @@ public class Level {
         createPaddle();
         createBricks();
         spawnBall();
+    }
+
+    private void loadSounds(){
+        loadHitSound();
+        loadLevelMusic();
     }
 
     public void increaseBrickAmount(){
@@ -67,7 +75,33 @@ public class Level {
         }
     }
 
-    private Clip hitSound;
+    protected void loadLevelMusic() {
+        try {
+            File file = new File("shreksophone.wav");
+            if (!file.exists()) return;
+            levelMusic = AudioSystem.getClip();
+            levelMusic.open(AudioSystem.getAudioInputStream(file));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void startLevelMusic() {
+        if (levelMusic != null && !levelMusic.isRunning()) {
+            levelMusic.setFramePosition(0);
+            levelMusic.loop(Clip.LOOP_CONTINUOUSLY);
+        }
+    }
+
+    protected void stopLevelMusic() {
+        if (levelMusic != null) {
+            if (levelMusic.isRunning()) {
+                levelMusic.stop();
+            }
+            levelMusic.close();
+            levelMusic = null;
+        }
+    }
 
     protected void onBrickDestroyed(GObject obj) {
         if (!(obj instanceof Brick)) return;
@@ -117,6 +151,7 @@ public class Level {
     }
 
     public void play() {
+        startLevelMusic();
         boolean isRunning = true;
         while (isRunning) {
             int boardWidth = (game.getWidth() > 0) ? game.getWidth() : Breakout.WIDTH;
@@ -305,6 +340,8 @@ public class Level {
 
         gameOverImage.setLocation(x, y);
         game.addToBoard(gameOverImage);
+
+        stopLevelMusic();
     }
 
     public void gameWon(){
@@ -318,6 +355,8 @@ public class Level {
 
         gameWinImage.setLocation(x, y);
         game.addToBoard(gameWinImage);
+
+        stopLevelMusic();
     }
 
     public void onTick() {
