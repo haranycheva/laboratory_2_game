@@ -6,6 +6,7 @@ import javax.sound.sampled.Clip;
 import java.awt.Color;
 import java.io.File;
 
+/** Базовий рівень: звуки, м'ячі, колізії та ігровий цикл. Цегла і поведінка задаються в підкласах. */
 public class Level {
     protected Breakout game;
     protected Ball ball;
@@ -28,15 +29,25 @@ public class Level {
 
     private RandomGenerator rgen = RandomGenerator.getInstance();
 
+    /**
+     * Рівень з мультибол-бонусом.
+     * @param game гра, до якої належить рівень
+     */
     public Level(Breakout game) {
         this.game = game;
     }
 
+    /**
+     * Рівень, де мультибол можна вимкнути.
+     * @param game гра, до якої належить рівень
+     * @param multiBallEnabled true, якщо цегла може давати додаткові м'ячі
+     */
     public Level(Breakout game, boolean multiBallEnabled) {
         this.game = game;
         this.multiBallEnabled = multiBallEnabled;
     }
 
+    /** Створює фон, статистику, платформу, цеглу і м'яч. */
     public void setup() {
         loadSounds();
         bricksRemaining = 0;
@@ -51,6 +62,7 @@ public class Level {
         spawnBall();
     }
 
+    /** Завантажує всі звуки. */
     private void loadSounds(){
         hitSound = loadSingleSound("brickHit.wav");
         levelMusic = loadSingleSound("shreksophone.wav");
@@ -59,10 +71,16 @@ public class Level {
         lifeLostSound = loadSingleSound("lifeLost.wav");
     }
 
+    /** Збільшує лічильник цегли, що залишилась. */
     public void increaseBrickAmount(){
         bricksRemaining+=1;
     }
 
+    /**
+     * Завантажує один звуковий файл.
+     * @param fileName ім'я файлу
+     * @return звук або null, якщо файлу немає чи він не відкрився
+     */
     private Clip loadSingleSound(String fileName) {
         try {
             File file = new File(fileName);
@@ -76,6 +94,10 @@ public class Level {
         }
     }
 
+    /**
+     * Програє звук з початку.
+     * @param clip звук (якщо null, нічого не робить)
+     */
     private void playSingleSound(Clip clip) {
         if (clip != null) {
             if (clip.isRunning()) {
@@ -86,6 +108,7 @@ public class Level {
         }
     }
 
+    /** Запускає музику рівня по колу. */
     protected void startLevelMusic() {
         if (levelMusic != null && !levelMusic.isRunning()) {
             levelMusic.setFramePosition(0);
@@ -93,6 +116,7 @@ public class Level {
         }
     }
 
+    /** Зупиняє і закриває музику рівня. */
     protected void stopLevelMusic() {
         if (levelMusic != null) {
             if (levelMusic.isRunning()) {
@@ -103,6 +127,10 @@ public class Level {
         }
     }
 
+    /**
+     * Опрацьовує влучання в цеглу: життя, видалення, рахунок і шанс на додатковий м'яч.
+     * @param obj об'єкт, у який влучив м'яч
+     */
     protected void onBrickDestroyed(GObject obj) {
         if (!(obj instanceof Brick)) return;
         Brick brick = (Brick) obj;
@@ -134,14 +162,17 @@ public class Level {
         stats.increaseScore();
     }
 
+    /** @return true, якщо гравець виграв */
     public boolean didWin() {
         return didWin;
     }
 
+    /** Створює цеглу, реалізується в підкласах. */
     public void createBricks() {
     }
 
 
+    /** Малює чорну лінію під панеллю статистики. */
     protected void createStatsWall() {
         statsWall = new GRect(0, 65, Breakout.APPLICATION_WIDTH, 5);
         statsWall.setFilled(true);
@@ -150,6 +181,7 @@ public class Level {
         game.addToBoard(statsWall);
     }
 
+    /** Головний цикл рівня: рух м'ячів, колізії, життя, перемога. */
     public void play() {
         startLevelMusic();
         boolean isRunning = true;
@@ -210,6 +242,7 @@ public class Level {
         }
     }
 
+    /** Видаляє всі м'ячі з поля. */
     private void removeAllBalls() {
         if (ball != null) {
             game.remove(ball);
@@ -228,6 +261,10 @@ public class Level {
         }
     }
 
+    /**
+     * Рухає платформу за мишею, не даючи вийти за краї.
+     * @param mouseX координата X миші
+     */
     public void movePaddle(int mouseX) {
         if (paddle == null) return;
         int x = mouseX - Breakout.PADDLE_WIDTH / 2;
@@ -242,6 +279,7 @@ public class Level {
         paddle.move(x);
     }
 
+    /** Малює фон рівня. */
     private void createBackground() {
         background = new GRect(0, 0, Breakout.APPLICATION_WIDTH, Breakout.APPLICATION_HEIGHT);
         background.setFilled(true);
@@ -249,12 +287,14 @@ public class Level {
         game.addToBoard(background);
     }
 
+    /** Створює платформу внизу по центру. */
     private void createPaddle() {
         double x = (game.getWidth() - Breakout.PADDLE_WIDTH) / 2.0;
         double y = game.getHeight() - Breakout.PADDLE_HEIGHT - Breakout.PADDLE_Y_OFFSET;
         paddle = new Paddle(game, x, y);
     }
 
+    /** Створює новий м'яч по центру. */
     protected void spawnBall() {
         if (ball != null) {
             game.remove(ball);
@@ -264,9 +304,19 @@ public class Level {
         game.addToBoard(ball);
     }
 
+    /**
+     * Перевіряє, чи об'єкт це цегла.
+     * @param object об'єкт для перевірки
+     * @return true, якщо це Brick
+     */
     protected boolean isBrick(GObject object) {
         return object instanceof  Brick;
     }
+
+    /**
+     * Перевіряє зіткнення м'яча з платформою, цеглою та верхньою стіною.
+     * @param currentBall м'яч, який перевіряємо
+     */
     protected void checkCollisions(Ball currentBall) {
         if (currentBall == null || paddle == null) return;
 
@@ -346,10 +396,15 @@ public class Level {
         }
     }
 
+    /**
+     * Налаштовує м'яч (наприклад, швидкість), перевизначається в підкласах.
+     * @param newball м'яч, який налаштовуємо
+     */
     protected void configureBall(Ball newball) {
 
     }
 
+    /** Завершує гру програшем. */
     public void gameOver() {
         stopLevelMusic();
         playSingleSound(gameOverSound);
@@ -365,6 +420,7 @@ public class Level {
         game.addToBoard(gameOverImage);
     }
 
+    /** Завершує гру перемогою. */
     public void gameWon(){
         stopLevelMusic();
         playSingleSound(gameWinSound);
@@ -380,6 +436,7 @@ public class Level {
         game.addToBoard(gameWinImage);
     }
 
+    /** Викликається щотіка, для особливої логіки рівнів. */
     public void onTick() {
     }
 

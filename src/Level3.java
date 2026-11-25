@@ -3,23 +3,27 @@ import acm.util.RandomGenerator;
 
 import java.awt.*;
 
+/** Рівень 3: цегла опускається вниз з часом, м'яч дуже швидкий. */
 public class Level3 extends Level {
     private int shiftCounter = 0;
     private int shiftIntervalTicks = 50;
     private double shiftAmountY = 12.0;
 
+    /** @param game гра, до якої належить рівень */
     public Level3(Breakout game) {
         super(game);
     }
 
     private RandomGenerator rgen = RandomGenerator.getInstance();
 
+    /** Скидає лічильник зсуву. */
     @Override
     public void setup() {
         super.setup();
         shiftCounter = 0;
     }
 
+    /** Раз на кілька тіків зсуває цеглу вниз. */
     @Override
     public void onTick() {
         shiftCounter++;
@@ -29,6 +33,7 @@ public class Level3 extends Level {
         }
     }
 
+    /** Зсуває цеглу в кожній колонці, не нижче за платформу. */
     private void shiftBricksDown() {
         double totalRowWidth = Breakout.NBRICKS_PER_ROW * Breakout.BRICK_WIDTH
                 + (Breakout.NBRICKS_PER_ROW - 1) * Breakout.BRICK_SEP;
@@ -65,6 +70,7 @@ public class Level3 extends Level {
         }
     }
 
+    /** Створює цеглу з випадковою кількістю життів (до 5). */
     public void createBricks() {
         double totalRowWidth = Breakout.NBRICKS_PER_ROW * Breakout.BRICK_WIDTH + (Breakout.NBRICKS_PER_ROW - 1) * Breakout.BRICK_SEP;
         double startX = (Breakout.WIDTH - totalRowWidth) / 2.0;
@@ -104,6 +110,10 @@ public class Level3 extends Level {
         }
     }
 
+    /**
+     * Ставить найвищу швидкість м'яча.
+     * @param newBall м'яч, який налаштовуємо
+     */
     @Override
     protected void configureBall(Ball newBall) {
         newBall.setVelocityX(7.5);

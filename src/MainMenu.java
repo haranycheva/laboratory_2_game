@@ -6,6 +6,7 @@ import javax.sound.sampled.Clip;
 import java.awt.*;
 import java.io.File;
 
+/** Головне меню: фон, заголовок, цегла, кнопки рівнів і музика. */
 public class MainMenu {
     private static final int TOP_BRICKS_Y = 100;
     private static final int BOTTOM_BRICKS_Y = 200;
@@ -17,10 +18,12 @@ public class MainMenu {
     private LevelButton level2;
     private LevelButton level3;
 
+    /** @param game гра, на полі якої малюється меню */
     public MainMenu(Breakout game) {
         this.game = game;
     }
 
+    /** Малює декоративну цеглу над і під заголовком. */
     public void createBricks() {
         int width = (Breakout.APPLICATION_WIDTH - 20 - 3 * 4) / 5;
         int totalWidth = 4 * width + 3 * BRICK_GAP;
@@ -56,6 +59,7 @@ public class MainMenu {
         }
     }
 
+    /** Малює і масштабує заголовок гри. */
     public void createTitle() {
         GImage title = new GImage("breakout.png");
         int brickWidth = (Breakout.APPLICATION_WIDTH - 20 - 3 * BRICK_GAP) / 4;
@@ -77,6 +81,7 @@ public class MainMenu {
         game.addToBoard(title);
     }
 
+    /** Створює три кнопки рівнів. */
     public void createButtons() {
         int levelX = (Breakout.APPLICATION_WIDTH - 200) / 2;
         int levelY = 300;
@@ -89,6 +94,7 @@ public class MainMenu {
         level3.addToBoard();
     }
 
+    /** Малює фон меню. */
     public void createBackground() {
         GRect background = new GRect(0,0 , Breakout.APPLICATION_WIDTH, Breakout.APPLICATION_HEIGHT);
         Color back = new Color(0xDBDFAC);
@@ -97,6 +103,7 @@ public class MainMenu {
         game.addToBoard(background);
     }
 
+    /** Запускає музику меню по колу. */
     public void playMenuMusic()  {
         try {
             File file = new File("mainMenuIntro.wav");
@@ -108,12 +115,19 @@ public class MainMenu {
         }
     }
 
+    /** Зупиняє музику меню. */
     private void stopMainMenuMusic() {
         if (menuMusic != null) {
             menuMusic.stop();
         }
     }
 
+    /**
+     * Перевіряє, чи клікнули по кнопці рівня 1 (і зупиняє музику).
+     * @param x координата X кліку
+     * @param y координата Y кліку
+     * @return true, якщо клік потрапив у кнопку
+     */
     public boolean isLevel1Clicked(double x, double y) {
         if (level1.contains(x, y)) {
             stopMainMenuMusic();
@@ -122,6 +136,12 @@ public class MainMenu {
         return false;
     }
 
+    /**
+     * Перевіряє, чи клікнули по кнопці рівня 2 (і зупиняє музику).
+     * @param x координата X кліку
+     * @param y координата Y кліку
+     * @return true, якщо клік потрапив у кнопку
+     */
     public boolean isLevel2Clicked(double x, double y) {
         if (level2.contains(x, y)) {
             stopMainMenuMusic();
@@ -130,6 +150,12 @@ public class MainMenu {
         return false;
     }
 
+    /**
+     * Перевіряє, чи клікнули по кнопці рівня 3 (і зупиняє музику).
+     * @param x координата X кліку
+     * @param y координата Y кліку
+     * @return true, якщо клік потрапив у кнопку
+     */
     public boolean isLevel3Clicked(double x, double y) {
         if (level3.contains(x, y)) {
             stopMainMenuMusic();

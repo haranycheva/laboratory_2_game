@@ -1,12 +1,15 @@
 import acm.graphics.*;
 import java.awt.*;
 
+/** Рівень 1: звичайна цегла з одним життям, без додаткових м'ячів. */
 public class Level1 extends Level {
 
+    /** @param game гра, до якої належить рівень */
     public Level1(Breakout game) {
         super(game, false);
     }
 
+    /** Створює 5 рядків цегли. */
     public void createBricks() {
         double totalRowWidth = Breakout.NBRICKS_PER_ROW * Breakout.BRICK_WIDTH + (Breakout.NBRICKS_PER_ROW - 1) * Breakout.BRICK_SEP;
         double startX = (Breakout.WIDTH - totalRowWidth) / 2.0;

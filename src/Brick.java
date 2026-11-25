@@ -5,12 +5,19 @@ import acm.graphics.GRect;
 
 import java.awt.*;
 
+/** Цегла з кількістю життів; якщо життів більше одного, показує їх число. */
 public class Brick extends GCompound {
 
     private int lives = 1;
     private GLabel livesLabel;
 
 
+    /**
+     * Цегла з одним життям.
+     * @param x координата X лівого верхнього кута
+     * @param y координата Y лівого верхнього кута
+     * @param color колір цегли
+     */
     public Brick (double x, double y, Color color) {
         GRect brick = new GRect(Breakout.BRICK_WIDTH, Breakout.BRICK_HEIGHT);
         brick.setFilled(true);
@@ -20,6 +27,13 @@ public class Brick extends GCompound {
         setLocation(x, y);
     }
 
+    /**
+     * Цегла із заданою кількістю життів.
+     * @param x координата X лівого верхнього кута
+     * @param y координата Y лівого верхнього кута
+     * @param color колір цегли
+     * @param lives кількість життів (мінімум 1)
+     */
     public Brick(double x, double y, Color color, int lives) {
         this.lives = Math.max(1, lives);
 
@@ -39,6 +53,7 @@ public class Brick extends GCompound {
         setLocation(x, y);
     }
 
+    /** Оновлює число життів на цеглі. */
     private void updateLabel() {
         if(livesLabel == null) return;
         if (lives > 1) {
@@ -51,6 +66,7 @@ public class Brick extends GCompound {
         }
     }
 
+    /** Віднімає одне життя. */
     public void hit() {
         if (lives > 0) {
             lives--;
@@ -58,15 +74,13 @@ public class Brick extends GCompound {
         }
     }
 
+    /** @return true, якщо цегла зруйнована */
     public boolean isDestroyed() {
         return lives <= 0;
     }
 
+    /** @return поточна кількість життів */
     public int getLives() {
         return lives;
-    }
-
-    public boolean isThisBrick(GObject object) {
-        return object == this;
     }
 }

@@ -1,9 +1,9 @@
 import acm.graphics.GImage;
 import acm.graphics.GLabel;
-import acm.graphics.GRect;
 
 import java.awt.*;
 
+/** Рахунок і життя гравця та їх відображення зверху поля. */
 public class GameStats {
     private Breakout game;
     private int score = 0;
@@ -12,10 +12,12 @@ public class GameStats {
     private GLabel livesLabel;
     private GLabel scoreLabel;
 
+    /** @param game гра, на полі якої малюється статистика */
     public GameStats(Breakout game) {
         this.game = game;
     }
 
+    /** Малює сердечко і кількість життів. */
     public void drawLives() {
         heart = new GImage("heart.png", Breakout.APPLICATION_WIDTH - 100, 10);
         heart.setSize(50,50);
@@ -27,6 +29,7 @@ public class GameStats {
         game.addToBoard(livesLabel);
     }
 
+    /** Малює рахунок. */
     public void drawScore() {
         scoreLabel = new GLabel("SCORE: " + score);
         scoreLabel.setLocation(10, 50);
@@ -34,11 +37,16 @@ public class GameStats {
         game.addToBoard(scoreLabel);
     }
 
+    /** Додає 10 очок. */
     public void increaseScore() {
         score += 10;
         scoreLabel.setLabel("SCORE: " + score);
     }
 
+    /**
+     * Віднімає життя.
+     * @return true, якщо життя закінчились
+     */
     public boolean decreaseLives() {
         lives--;
         livesLabel.setLabel("x " + lives);
