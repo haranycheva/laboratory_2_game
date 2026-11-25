@@ -267,36 +267,62 @@ public class Level {
     protected boolean isBrick(GObject object) {
         return object instanceof  Brick;
     }
-
     protected void checkCollisions(Ball currentBall) {
         if (currentBall == null || paddle == null) return;
 
         double bx = currentBall.getX();
         double by = currentBall.getY();
         double r = currentBall.getRadius();
+        double dx = r * 0.7;
         GObject paddleObj = paddle.getPaddle();
-        
-        GObject bottomObj = game.getElementAt(bx, by + r + 2);
+
+        double minTop = (statsWall != null) ? statsWall.getY() + statsWall.getHeight() : 0.0;
+        if (by - r <= minTop + 1.0) {
+            by = minTop + r + 2.0;
+            currentBall.setLocation(bx, by);
+            if (currentBall.getVelocityY() < 0) {
+                currentBall.setVelocityY(-currentBall.getVelocityY());
+            }
+        }
+
+        double bottomY = by + r + 2;
+        GObject bottomObj = game.getElementAt(bx, bottomY);
+        if (bottomObj == null || bottomObj == background) {
+            bottomObj = game.getElementAt(bx - dx, bottomY);
+        }
+        if (bottomObj == null || bottomObj == background) {
+            bottomObj = game.getElementAt(bx + dx, bottomY);
+        }
+
         if (bottomObj != null && (bottomObj == paddleObj || isBrick(bottomObj))) {
             if (bottomObj == paddleObj) {
                 currentBall.setLocation(bx, paddleObj.getY() - r - 2);
+                if (currentBall.getVelocityY() > 0) {
+                    currentBall.setVelocityY(-currentBall.getVelocityY());
+                }
             } else {
                 currentBall.setLocation(bx, bottomObj.getY() - r - 2);
                 onBrickDestroyed(bottomObj);
+                currentBall.bounceY();
             }
-            currentBall.bounceY();
             return;
         }
 
-        GObject topObj = game.getElementAt(bx, by - r - 2);
-        if (topObj != null && (topObj == statsWall || isBrick(topObj))) {
-            if (isBrick(topObj)) {
-                currentBall.setLocation(bx, topObj.getY() + topObj.getHeight() + r + 2);
-                onBrickDestroyed(topObj);
-            } else {
-                currentBall.setLocation(bx, statsWall.getY() + statsWall.getHeight() + r + 2);
+        double topY = by - r - 2;
+        GObject topObj = game.getElementAt(bx, topY);
+        if (topObj == null || topObj == background) {
+            topObj = game.getElementAt(bx - dx, topY);
+        }
+        if (topObj == null || topObj == background) {
+            topObj = game.getElementAt(bx + dx, topY);
+        }
+
+        if (topObj != null && isBrick(topObj)) {
+            currentBall.setLocation(bx, topObj.getY() + topObj.getHeight() + r + 2);
+            onBrickDestroyed(topObj);
+            if (currentBall.getVelocityY() < 0) {
+                currentBall.setVelocityY(-currentBall.getVelocityY());
             }
-            currentBall.bounceY();
             return;
         }
 
@@ -304,7 +330,9 @@ public class Level {
         if (leftObj != null && isBrick(leftObj)) {
             currentBall.setLocation(leftObj.getX() + leftObj.getWidth() + r + 2, by);
             onBrickDestroyed(leftObj);
-            currentBall.bounceX();
+            if (currentBall.getVelocityX() < 0) {
+                currentBall.setVelocityX(-currentBall.getVelocityX());
+            }
             return;
         }
 
@@ -312,7 +340,9 @@ public class Level {
         if (rightObj != null && isBrick(rightObj)) {
             currentBall.setLocation(rightObj.getX() - r - 2, by);
             onBrickDestroyed(rightObj);
-            currentBall.bounceX();
+            if (currentBall.getVelocityX() > 0) {
+                currentBall.setVelocityX(-currentBall.getVelocityX());
+            }
         }
     }
 

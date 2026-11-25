@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class Level3 extends Level {
     private int shiftCounter = 0;
-    private int shiftIntervalTicks = 250; 
+    private int shiftIntervalTicks = 50;
     private double shiftAmountY = 12.0;
 
     public Level3(Breakout game) {
@@ -106,7 +106,7 @@ public class Level3 extends Level {
 
     @Override
     protected void configureBall(Ball newBall) {
-        newBall.setVelocityX(4.5);
-        newBall.setVelocityY(-5.5);
+        newBall.setVelocityX(7.5);
+        newBall.setVelocityY(-8.5);
     }
 }
