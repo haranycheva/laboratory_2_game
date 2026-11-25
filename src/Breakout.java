@@ -1,8 +1,7 @@
 /*
  * File: Breakout.java
  * -------------------
- * Name:
- * Section Leader:
+ * Authors: Horoshko Yehor, Haranysheva Maria
  *
  * This file will eventually implement the game of Breakout.
  */

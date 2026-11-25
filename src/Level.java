@@ -1,3 +1,10 @@
+/*
+ * File: Level.java
+ * -------------------
+ * Authors: Horoshko Yehor, Haranysheva Maria
+ *
+ */
+
 import acm.graphics.*;
 import acm.util.RandomGenerator;
 
@@ -8,16 +15,16 @@ import java.io.File;
 
 /** Базовий рівень: звуки, м'ячі, колізії та ігровий цикл. Цегла і поведінка задаються в підкласах. */
 public class Level {
-    protected Breakout game;
-    protected Ball ball;
-    protected Ball secondBall;
-    protected Ball thirdBall;
-    protected Paddle paddle;
-    protected GRect background;
-    protected GameStats stats;
-    protected GRect statsWall;
+    public Breakout game;
+    public Ball ball;
+    public Ball secondBall;
+    public Ball thirdBall;
+    public Paddle paddle;
+    public GRect background;
+    public GameStats stats;
+    public GRect statsWall;
 
-    protected int bricksRemaining = 0;
+    public int bricksRemaining = 0;
     private boolean didWin = false;
     private boolean multiBallEnabled = true;
 
@@ -109,7 +116,7 @@ public class Level {
     }
 
     /** Запускає музику рівня по колу. */
-    protected void startLevelMusic() {
+    public void startLevelMusic() {
         if (levelMusic != null && !levelMusic.isRunning()) {
             levelMusic.setFramePosition(0);
             levelMusic.loop(Clip.LOOP_CONTINUOUSLY);
@@ -117,7 +124,7 @@ public class Level {
     }
 
     /** Зупиняє і закриває музику рівня. */
-    protected void stopLevelMusic() {
+    public void stopLevelMusic() {
         if (levelMusic != null) {
             if (levelMusic.isRunning()) {
                 levelMusic.stop();
@@ -131,7 +138,7 @@ public class Level {
      * Опрацьовує влучання в цеглу: життя, видалення, рахунок і шанс на додатковий м'яч.
      * @param obj об'єкт, у який влучив м'яч
      */
-    protected void onBrickDestroyed(GObject obj) {
+    public void onBrickDestroyed(GObject obj) {
         if (!(obj instanceof Brick)) return;
         Brick brick = (Brick) obj;
         brick.hit();
@@ -173,7 +180,7 @@ public class Level {
 
 
     /** Малює чорну лінію під панеллю статистики. */
-    protected void createStatsWall() {
+    public void createStatsWall() {
         statsWall = new GRect(0, 65, Breakout.APPLICATION_WIDTH, 5);
         statsWall.setFilled(true);
         statsWall.setFillColor(Color.BLACK);
@@ -295,7 +302,7 @@ public class Level {
     }
 
     /** Створює новий м'яч по центру. */
-    protected void spawnBall() {
+    public void spawnBall() {
         if (ball != null) {
             game.remove(ball);
         }
@@ -309,7 +316,7 @@ public class Level {
      * @param object об'єкт для перевірки
      * @return true, якщо це Brick
      */
-    protected boolean isBrick(GObject object) {
+    public boolean isBrick(GObject object) {
         return object instanceof  Brick;
     }
 
@@ -317,7 +324,7 @@ public class Level {
      * Перевіряє зіткнення м'яча з платформою, цеглою та верхньою стіною.
      * @param currentBall м'яч, який перевіряємо
      */
-    protected void checkCollisions(Ball currentBall) {
+    public void checkCollisions(Ball currentBall) {
         if (currentBall == null || paddle == null) return;
 
         double bx = currentBall.getX();
@@ -400,7 +407,7 @@ public class Level {
      * Налаштовує м'яч (наприклад, швидкість), перевизначається в підкласах.
      * @param newball м'яч, який налаштовуємо
      */
-    protected void configureBall(Ball newball) {
+    public void configureBall(Ball newball) {
 
     }
 

@@ -1,3 +1,10 @@
+/*
+ * File: Brick.java
+ * -------------------
+ * Authors: Horoshko Yehor, Haranysheva Maria
+ *
+ */
+
 import acm.graphics.GCompound;
 import acm.graphics.GLabel;
 import acm.graphics.GObject;

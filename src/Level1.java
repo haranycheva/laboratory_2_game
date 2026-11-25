@@ -1,4 +1,10 @@
-import acm.graphics.*;
+/*
+ * File: Level1.java
+ * -------------------
+ * Authors: Horoshko Yehor, Haranysheva Maria
+ *
+ */
+
 import java.awt.*;
 
 /** Рівень 1: звичайна цегла з одним життям, без додаткових м'ячів. */

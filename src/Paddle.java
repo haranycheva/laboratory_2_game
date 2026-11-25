@@ -1,4 +1,10 @@
-import acm.graphics.GOval;
+/*
+ * File: Paddle.java
+ * -------------------
+ * Authors: Horoshko Yehor, Haranysheva Maria
+ *
+ */
+
 import acm.graphics.GRect;
 
 import java.awt.*;

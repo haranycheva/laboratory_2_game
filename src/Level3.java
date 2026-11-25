@@ -1,3 +1,10 @@
+/*
+ * File: Level2.java
+ * -------------------
+ * Authors: Horoshko Yehor, Haranysheva Maria
+ *
+ */
+
 import acm.graphics.GObject;
 import acm.util.RandomGenerator;
 
@@ -31,6 +38,17 @@ public class Level3 extends Level {
             shiftCounter = 0;
             shiftBricksDown();
         }
+    }
+
+    /** Створює новий м'яч над платформою. */
+    @Override
+    public void spawnBall() {
+        if (ball != null) {
+            game.remove(ball);
+        }
+        ball = new Ball(game,Breakout.WIDTH / 2.0, Breakout.HEIGHT / 2.0 + 100);
+        configureBall(ball);
+        game.addToBoard(ball);
     }
 
     /** Зсуває цеглу в кожній колонці, не нижче за платформу. */
@@ -115,7 +133,7 @@ public class Level3 extends Level {
      * @param newBall м'яч, який налаштовуємо
      */
     @Override
-    protected void configureBall(Ball newBall) {
+    public void configureBall(Ball newBall) {
         newBall.setVelocityX(7.5);
         newBall.setVelocityY(-8.5);
     }
