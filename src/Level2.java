@@ -3,14 +3,17 @@ import acm.util.RandomGenerator;
 
 import java.awt.*;
 
+/** Рівень 2: цегла з 1-3 життями та швидший м'яч. */
 public class Level2 extends Level {
 
     private RandomGenerator rgen = RandomGenerator.getInstance();
 
+    /** @param game гра, до якої належить рівень */
     public Level2(Breakout game) {
         super(game);
     }
 
+    /** Створює цеглу з випадковою кількістю життів. */
     public void createBricks() {
         double totalRowWidth = Breakout.NBRICKS_PER_ROW * Breakout.BRICK_WIDTH + (Breakout.NBRICKS_PER_ROW - 1) * Breakout.BRICK_SEP;
         double startX = (Breakout.WIDTH - totalRowWidth) / 2.0;
@@ -52,6 +55,10 @@ public class Level2 extends Level {
         }
     }
 
+    /**
+     * Збільшує швидкість м'яча.
+     * @param newBall м'яч, який налаштовуємо
+     */
     @Override
     protected void configureBall(Ball newBall) {
         newBall.setVelocityX(4.5);

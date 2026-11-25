@@ -12,6 +12,7 @@ import acm.program.*;
 
 import java.awt.event.*;
 
+/** Головний клас гри: вікно, головне меню та запуск рівнів. */
 public class Breakout extends GraphicsProgram {
     public static void main(String[] args) {
         new Breakout().start();
@@ -54,11 +55,8 @@ public class Breakout extends GraphicsProgram {
     /** Offset of the top brick row from the top */
     public static final int BRICK_Y_OFFSET = 110;
 
-    /** Number of turns */
-    public static final int NTURNS = 3;
 
-    /* Method: run() */
-    /** Runs the Breakout program. */
+    /** Показує меню і чекає, поки гравець обере рівень, потім запускає його. */
     public void run() {
         this.setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
         addMouseListeners();
@@ -83,6 +81,7 @@ public class Breakout extends GraphicsProgram {
         }
     }
 
+    /** Створює і малює головне меню. */
     private void mainMenu() {
         mainMenu = new MainMenu(this);
         mainMenu.createBackground();
@@ -92,10 +91,18 @@ public class Breakout extends GraphicsProgram {
         mainMenu.playMenuMusic();
     }
 
+    /**
+     * Додає об'єкт на ігрове поле.
+     * @param object об'єкт, який додаємо
+     */
     public void addToBoard(GObject object) {
         add(object);
     }
 
+    /**
+     * Обробляє клік по кнопках рівнів у меню.
+     * @param e подія кліку миші
+     */
     public void mouseClicked(MouseEvent e) {
         double x = e.getX();
         double y = e.getY();
@@ -113,12 +120,20 @@ public class Breakout extends GraphicsProgram {
         }
     }
 
+    /**
+     * Рухає платформу за мишею.
+     * @param e подія руху миші
+     */
     public void mouseMoved(MouseEvent e) {
         if (currentLevel != null) {
             currentLevel.movePaddle(e.getX());
         }
     }
 
+    /**
+     * Позначає, що гра закінчилась (виграш або програш).
+     * @param gameOver true, якщо гра закінчилась
+     */
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
     }

@@ -3,9 +3,18 @@ import acm.graphics.GRect;
 
 import java.awt.*;
 
+/** Кнопка вибору рівня з написом. */
 public class LevelButton {
     private Breakout game;
 
+    /**
+     * Створює кнопку з написом по центру.
+     * @param game гра, на полі якої малюється кнопка
+     * @param x координата X лівого верхнього кута
+     * @param y координата Y лівого верхнього кута
+     * @param text напис на кнопці
+     * @param fillColor колір заливки
+     */
     public LevelButton(Breakout game, double x, double y, String text, Color fillColor) {
         this.game = game;
         double width = 200;
@@ -28,11 +37,18 @@ public class LevelButton {
         game.addToBoard(label);
     }
 
+    /** Додає кнопку і напис на поле. */
     public void addToBoard() {
         game.addToBoard(button);
         game.addToBoard(label);
     }
 
+    /**
+     * Перевіряє, чи точка знаходиться всередині кнопки.
+     * @param x координата X точки
+     * @param y координата Y точки
+     * @return true, якщо точка в межах кнопки
+     */
     public boolean contains(double x, double y) {
         return button.contains(x, y);
     }

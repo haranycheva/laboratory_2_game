@@ -1,6 +1,7 @@
 import acm.graphics.*;
 import java.awt.Color;
 
+/** М'яч зі швидкістю, відбиттям від стін і слідом із 16 відрізків. */
 public class Ball extends GCompound {
     private double velocityX = 3.0;
     private double velocityY = -4.0;
@@ -28,6 +29,12 @@ public class Ball extends GCompound {
 
     private Breakout game;
 
+    /**
+     * Створює м'яч.
+     * @param game гра, на полі якої малюється м'яч і слід
+     * @param x початкова координата X центру
+     * @param y початкова координата Y центру
+     */
     public Ball(Breakout game, double x, double y) {
         this.game = game;
         double diameter = radius * 2.0;
@@ -42,6 +49,10 @@ public class Ball extends GCompound {
         previousY = y;
     }
 
+    /**
+     * Рухає м'яч, відбиває від лівої, правої та верхньої стін і оновлює слід.
+     * @param width ширина поля
+     */
     public void moveAndBounceWalls(double width) {
         move(velocityX, velocityY);
         double x = getX();
@@ -89,6 +100,7 @@ public class Ball extends GCompound {
         previousY = currentY;
     }
 
+    /** Прибирає весь слід м'яча з поля. */
     public void clearTrail() {
         if (segment1 != null) {
             game.remove(segment1);
@@ -172,34 +184,46 @@ public class Ball extends GCompound {
     }
 
 
+    /**
+     * Перевіряє, чи м'яч торкнувся низу поля.
+     * @param height висота поля
+     * @return true, якщо м'яч досяг низу
+     */
     public boolean isHitBottom(double height) {
         return getY() + radius >= height;
     }
 
+    /** Змінює напрямок руху по вертикалі. */
     public void bounceY() {
         velocityY = -velocityY;
     }
 
+    /** Змінює напрямок руху по горизонталі. */
     public void bounceX() {
         velocityX = -velocityX;
     }
 
+    /** @return швидкість по X */
     public double getVelocityX() {
         return velocityX;
     }
 
+    /** @param velocityX нова швидкість по X */
     public void setVelocityX(double velocityX) {
         this.velocityX = velocityX;
     }
 
+    /** @return швидкість по Y */
     public double getVelocityY() {
         return velocityY;
     }
 
+    /** @param velocityY нова швидкість по Y */
     public void setVelocityY(double velocityY) {
         this.velocityY = velocityY;
     }
 
+    /** @return радіус м'яча */
     public double getRadius() {
         return radius;
     }
