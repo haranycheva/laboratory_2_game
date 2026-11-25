@@ -1,3 +1,10 @@
+/*
+ * File: Ball.java
+ * -------------------
+ * Authors: Horoshko Yehor, Haranysheva Maria
+ *
+ */
+
 import acm.graphics.*;
 import java.awt.Color;
 

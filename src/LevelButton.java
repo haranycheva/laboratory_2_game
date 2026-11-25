@@ -1,3 +1,10 @@
+/*
+ * File: LevelButton.java
+ * -------------------
+ * Authors: Horoshko Yehor, Haranysheva Maria
+ *
+ */
+
 import acm.graphics.GLabel;
 import acm.graphics.GRect;
 

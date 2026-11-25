@@ -1,3 +1,10 @@
+/*
+ * File: GameStats.java
+ * -------------------
+ * Authors: Horoshko Yehor, Haranysheva Maria
+ *
+ */
+
 import acm.graphics.GImage;
 import acm.graphics.GLabel;
 

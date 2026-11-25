@@ -1,4 +1,9 @@
-import acm.graphics.GObject;
+/*
+ * File: Level2.java
+ * -------------------
+ * Authors: Horoshko Yehor, Haranysheva Maria
+ *
+ */
 import acm.util.RandomGenerator;
 
 import java.awt.*;
@@ -60,7 +65,7 @@ public class Level2 extends Level {
      * @param newBall м'яч, який налаштовуємо
      */
     @Override
-    protected void configureBall(Ball newBall) {
+    public void configureBall(Ball newBall) {
         newBall.setVelocityX(4.5);
         newBall.setVelocityY(-5.5);
     }
